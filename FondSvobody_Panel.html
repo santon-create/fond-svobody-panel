@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фонд Свободы — Панель управления</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:        #0D1B2A;
+  --bg2:       #1a2d42;
+  --bg3:       #243547;
+  --bg4:       #2d4159;
+  --gold:      #C9A84C;
+  --gold2:     #e8c46a;
+  --gold-dim:  rgba(201,168,76,0.15);
+  --gold-line: rgba(201,168,76,0.3);
+  --text:      #E8E4DC;
+  --text2:     #A8A49C;
+  --text3:     #6E6A64;
+  --green:     #4CAF7D;
+  --green-bg:  rgba(76,175,125,0.12);
+  --amber:     #E8A842;
+  --amber-bg:  rgba(232,168,66,0.12);
+  --red:       #E05C5C;
+  --red-bg:    rgba(224,92,92,0.12);
+  --blue:      #6BA3D4;
+  --blue-bg:   rgba(107,163,212,0.12);
+  --border:    rgba(255,255,255,0.07);
+  --radius:    10px;
+  --sidebar-w: 220px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .brand {
+  font-family: 'Source Serif 4', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+.sidebar-logo .sub {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  padding: 10px 8px;
+  flex: 1;
+}
+.nav-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  padding: 8px 10px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+  margin-bottom: 1px;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--gold-dim); color: var(--gold); }
+.nav-item .icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+
+.sidebar-tags {
+  padding: 8px 8px;
+  border-top: 1px solid var(--border);
+}
+.tags-list { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 8px 8px; }
+.tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg3);
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'JetBrains Mono', monospace;
+}
+.tag:hover { background: var(--gold-dim); color: var(--gold); }
+
+.sidebar-user {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #a07830);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--bg);
+  flex-shrink: 0;
+}
+.user-info .name { font-size: 12px; font-weight: 600; }
+.user-info .role { font-size: 10px; color: var(--text3); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-track { background: transparent; }
+.main::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+.topbar {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-date {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.btn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 12px;
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.btn:hover { background: var(--bg4); color: var(--text); border-color: var(--gold-line); }
+.btn.primary {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border-color: var(--gold-line);
+}
+.btn.primary:hover { background: rgba(201,168,76,0.25); }
+
+.content { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 300px; height: 100%;
+  background: radial-gradient(ellipse at right, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-greeting {
+  font-size: 12px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+.hero-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.hero-title span { color: var(--gold); font-style: italic; }
+.hero-subtitle { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+.hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+.hero-stat .label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.hero-stat .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.hero-stat .sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+/* ── GRID ── */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text3);
+}
+.card-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-gold { background: var(--gold-dim); color: var(--gold); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+
+.goal-name {
+  font-size: 14px; font-weight: 600;
+  color: var(--text); margin-bottom: 3px;
+}
+.goal-target {
+  font-size: 11px; color: var(--text3); margin-bottom: 12px;
+}
+.goal-amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px; font-weight: 500;
+  color: var(--gold); margin-bottom: 4px;
+}
+.progress-bar {
+  height: 4px; background: var(--bg4);
+  border-radius: 2px; margin: 10px 0 6px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fill-gold { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+.fill-green { background: linear-gradient(90deg, var(--green), #6DCDA0); }
+.fill-blue { background: linear-gradient(90deg, var(--blue), #9BC4E8); }
+
+.goal-meta {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text3);
+}
+.goal-pct { font-weight: 700; color: var(--text2); }
+
+.input-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.input-row {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.input-label {
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text3);
+  font-weight: 600;
+}
+.input-field {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.input-field:focus { border-color: var(--gold-line); }
+
+.metric-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+.metric-row:first-child { padding-top: 0; }
+.metric-name { font-size: 13px; color: var(--text2); }
+.metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 500;
+  color: var(--text);
+}
+
+.rhythm-item {
+  display: flex; align-items: flex-start;
+  gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rhythm-item:last-child { border-bottom: none; padding-bottom: 0; }
+.rhythm-item:first-child { padding-top: 0; }
+.rhythm-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 5px;
+}
+.rhythm-content { flex: 1; }
+.rhythm-task { font-size: 13px; color: var(--text); font-weight: 500; margin-bottom: 3px; }
+.rhythm-meta { font-size: 11px; color: var(--text3); }
+.rhythm-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text3);
+  white-space: nowrap;
+}
+
+.doc-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  border-radius: 7px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.doc-card:hover { border-color: var(--gold-line); background: var(--bg4); }
+.doc-icon {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.doc-info { flex: 1; min-width: 0; }
+.doc-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.doc-meta { font-size: 11px; color: var(--text3); }
+.doc-badge { flex-shrink: 0; }
+
+.journal-entry {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.journal-entry:last-child { border-bottom: none; }
+.journal-entry:first-child { padding-top: 0; }
+.journal-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  margin-bottom: 4px;
+}
+.journal-decision { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.journal-logic { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+.journal-form { margin-top: 14px; }
+.journal-form textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  resize: none;
+  height: 60px;
+}
+.journal-form textarea:focus { border-color: var(--gold-line); }
+
+.status-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.status-row:last-child { border-bottom: none; }
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.status-name { flex: 1; font-size: 12px; color: var(--text2); }
+.status-val { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text3); }
+
+.view { display: none; }
+.view.active { display: flex; flex-direction: column; gap: 20px; }
+
+.timer-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px; font-weight: 500;
+  color: var(--gold); letter-spacing: 4px;
+  margin: 8px 0 4px;
+}
+.timer-label { font-size: 11px; color: var(--text3); }
+
+.section-title {
+  font-size: 18px;
+  font-family: 'Source Serif 4', serif;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.section-sub { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+
+.sync-bar {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px; color: var(--text3);
+}
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.sync-dot.loading { background: var(--amber); animation: pulse 1s infinite; }
+.sync-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.sheets-url-form {
+  display: flex; gap: 8px; align-items: center;
+}
+.sheets-url-form input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  outline: none;
+}
+.sheets-url-form input:focus { border-color: var(--gold-line); }
+.divider { height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">Фонд Свободы</div>
+    <div class="sub">Панель управления · v1.0</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Навигация</div>
+    <div class="nav-item active" data-view="dashboard">
+      <span class="icon">◈</span> Дашборд
+    </div>
+    <div class="nav-item" data-view="data">
+      <span class="icon">⊞</span> Данные
+    </div>
+    <div class="nav-item" data-view="documents">
+      <span class="icon">◻</span> Документы
+    </div>
+    <div class="nav-item" data-view="journal">
+      <span class="icon">◎</span> Журнал решений
+    </div>
+    <div class="nav-item" data-view="audit">
+      <span class="icon">◷</span> Аудит и ритм
+    </div>
+    <div class="nav-label" style="margin-top:12px">Теги</div>
+    <div class="tags-list">
+      <span class="tag">семья</span>
+      <span class="tag">стратегия</span>
+      <span class="tag">дети</span>
+      <span class="tag">методика</span>
+      <span class="tag">регламент</span>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar">АС</div>
+    <div class="user-info">
+      <div class="name">Антон Савиев</div>
+      <div class="role">архитектор · соинвестор</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-date" id="topbarDate">—</div>
+    <div class="topbar-right">
+      <div class="sync-bar" id="syncBar" style="padding:5px 10px">
+        <span class="sync-dot" id="syncDot"></span>
+        <span id="syncText">данные локальные</span>
+      </div>
+      <button class="btn primary" onclick="exportData()">↓ Экспорт</button>
+      <button class="btn" onclick="showImport()">↑ Импорт</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view active content" id="view-dashboard">
+    <div class="hero">
+      <div class="hero-greeting" id="greeting">Добрый день, Антон.</div>
+      <div class="hero-title">Капитал, который остаётся.<br><span>Свобода, которая передаётся.</span></div>
+      <div class="hero-subtitle">Фонд Свободы — Капитал Семьи</div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="label">Общий капитал</div><div class="value" id="h-total">—</div><div class="sub">родительский портфель</div></div>
+        <div class="hero-stat"><div class="label">Темп накопления КП</div><div class="value" id="h-kp">—</div><div class="sub">план / факт</div></div>
+        <div class="hero-stat"><div class="label">До следующего взноса</div><div class="timer-display" id="timerDisplay">—</div><div class="timer-label" id="timerLabel">—</div></div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Уровень 1 — Защита</span><span class="card-badge" id="badge-reserve">—</span></div>
+        <div class="goal-name">Резервный фонд</div>
+        <div class="goal-target">цель: ≥ 12 месяцев расходов</div>
+        <div class="goal-amount" id="reserve-amount">—</div>
+        <div class="progress-bar"><div class="progress-fill fill-gold" id="bar-reserve" style="width:0%"></div></div>
+        <div class="goal-meta"><span id="reserve-months">— мес из 12</span><span class="goal-pct" id="reserve-pct">—%</span></div>
+        <div style="margin-top:10px; font-size:11px; color:var(--text3)" id="brake-status">—</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Уровень 2 — Независимость</span><span class="card-badge badge-gold" id="badge-tn">Этап I</span></div>
+        <div class="goal-name">ТН 28 000 000 ₽</div>
+        <div class="goal-target" id="tn-year">горизонт: 2042</div>
+        <div class="goal-amount" id="capital-amount">—</div>
+        <div class="progress-bar"><div class="progress-fill fill-gold" id="bar-capital" style="width:0%"></div></div>
+        <div class="goal-meta"><span id="capital-meta">темп —% / мес</span><span class="goal-pct" id="capital-pct">—%</span></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Уровень 3 — Дети</span><span class="card-badge badge-blue">4.5 М × 2</span></div>
+        <div class="goal-name">Свобода детей</div>
+        <div class="goal-target">Лидия и Егор · по 4 500 000 ₽</div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px;color:var(--text2)">Лидия</span><span class="goal-amount" style="font-size:16px" id="lida-amount">—</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-blue" id="bar-lida" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--text3);text-align:right;margin-bottom:8px" id="lida-pct">—%</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px;color:var(--text2)">Егор</span><span class="goal-amount" style="font-size:16px" id="egor-amount">—</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-green" id="bar-egor" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--text3);text-align:right" id="egor-pct">—%</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-header"><span class="card-title">Статус ребалансировки</span><span class="card-badge badge-green">актуально</span></div><div id="rebalance-rows"></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Ритм системы · ближайшее</span></div><div id="rhythm-list"></div></div>
+    </div>
+  </div>
+
+  <!-- DATA INPUT -->
+  <div class="view content" id="view-data">
+    <div><div class="section-title">Данные портфеля</div><div class="section-sub">Вводи актуальные цифры — дашборд пересчитается автоматически</div></div>
+    <div class="sync-bar" id="sheetsBar">
+      <span class="sync-dot" id="sheetsDot"></span>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">Синхронизация с Google Sheets</div>
+        <div class="sheets-url-form">
+          <input type="text" id="sheetsUrl" placeholder="Вставь ссылку на публичный CSV..." oninput="saveSheetsUrl()">
+          <button class="btn primary" onclick="loadFromSheets()">Загрузить</button>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">Файл → Поделиться → Опубликовать в интернете → CSV → Скопировать ссылку</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Родительский портфель</span></div>
+      <div class="input-grid">
+        <div class="input-row"><label class="input-label">Текущий капитал (₽)</label><input class="input-field" type="number" id="inp-capital" placeholder="1 250 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Ежемесячный взнос (₽)</label><input class="input-field" type="number" id="inp-contribution" placeholder="35 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Резервный фонд (₽)</label><input class="input-field" type="number" id="inp-reserve" placeholder="850 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Расходы семьи / мес (₽)</label><input class="input-field" type="number" id="inp-expenses" placeholder="85 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Плановый КП на дату</label><input class="input-field" type="number" id="inp-planned" placeholder="1 400 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Дата последнего взноса</label><input class="input-field" type="date" id="inp-lastContrib" oninput="calc()"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Детские портфели</span></div>
+      <div class="input-grid">
+        <div class="input-row"><label class="input-label">Капитал Лидии (₽)</label><input class="input-field" type="number" id="inp-lida" placeholder="45 000" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Капитал Егора (₽)</label><input class="input-field" type="number" id="inp-egor" placeholder="12 000" oninput="calc()"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Структура портфеля (факт, %)</span></div>
+      <div class="input-grid">
+        <div class="input-row"><label class="input-label">LQDT (цель ≥ 4%)</label><input class="input-field" type="number" id="inp-lqdt" placeholder="4.2" step="0.1" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">GOLD ETF (цель ≥ 9%)</label><input class="input-field" type="number" id="inp-gold" placeholder="9.1" step="0.1" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Нефтегаз (лимит ≤ 22%)</label><input class="input-field" type="number" id="inp-oil" placeholder="18.0" step="0.1" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Банки (лимит ≤ 20%)</label><input class="input-field" type="number" id="inp-banks" placeholder="15.0" step="0.1" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">IT/Телеком (лимит ≤ 15%)</label><input class="input-field" type="number" id="inp-it" placeholder="5.0" step="0.1" oninput="calc()"></div>
+        <div class="input-row"><label class="input-label">Медицина (лимит ≤ 10%)</label><input class="input-field" type="number" id="inp-med" placeholder="3.0" step="0.1" oninput="calc()"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Рассчитанные показатели</span></div>
+      <div class="metric-row"><span class="metric-name">Запас устойчивости</span><span class="metric-value" id="calc-reserve">—</span></div>
+      <div class="metric-row"><span class="metric-name">Темп накопления КП</span><span class="metric-value" id="calc-kp">—</span></div>
+      <div class="metric-row"><span class="metric-name">Прогресс к ТН (28 млн)</span><span class="metric-value" id="calc-tn">—</span></div>
+      <div class="metric-row"><span class="metric-name">Прогноз даты ТН</span><span class="metric-value" id="calc-forecast">—</span></div>
+      <div class="metric-row"><span class="metric-name">Статус автотормоза</span><span class="metric-value" id="calc-brake">—</span></div>
+      <div class="metric-row"><span class="metric-name">LQDT статус</span><span class="metric-value" id="calc-lqdt">—</span></div>
+      <div class="metric-row"><span class="metric-name">GOLD статус</span><span class="metric-value" id="calc-gold">—</span></div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS -->
+  <div class="view content" id="view-documents">
+    <div><div class="section-title">Документы системы</div><div class="section-sub">Нажми на документ чтобы открыть файл</div></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Рабочие документы</span></div>
+      <a class="doc-card" href="#" onclick="openDoc(0)"><div class="doc-icon" style="background:var(--gold-dim)">◈</div><div class="doc-info"><div class="doc-name">Панель управления</div><div class="doc-meta">Документ №0 · Excel · обновлять ежеквартально</div></div><span class="card-badge badge-gold doc-badge">актуально</span></a>
+      <a class="doc-card" href="#" onclick="openDoc(1)"><div class="doc-icon" style="background:rgba(201,168,76,0.08)">⚖</div><div class="doc-info"><div class="doc-name">Семейная Конституция</div><div class="doc-meta">Документ №1 · DOCX · раз в 2 года</div></div><span class="card-badge badge-gold doc-badge" id="const-ver">v1.0</span></a>
+      <a class="doc-card" href="#" onclick="openDoc(2)"><div class="doc-icon" style="background:var(--blue-bg)">◎</div><div class="doc-info"><div class="doc-name">Стратегия родительского портфеля</div><div class="doc-meta">Документ №2 · DOCX · раз в год</div></div><span class="card-badge badge-blue doc-badge">v4.1</span></a>
+      <a class="doc-card" href="#" onclick="openDoc(3)"><div class="doc-icon" style="background:var(--green-bg)">◌</div><div class="doc-info"><div class="doc-name">Капитал Свободы — детские портфели</div><div class="doc-meta">Документ №3 · DOCX · раз в год</div></div><span class="card-badge badge-green doc-badge">v1.3</span></a>
+      <a class="doc-card" href="#" onclick="openDoc(4)"><div class="doc-icon" style="background:var(--amber-bg)">◷</div><div class="doc-info"><div class="doc-name">Регламент управления и преемственности</div><div class="doc-meta">Документ №4 · DOCX · раз в 2 года</div></div><span class="card-badge badge-amber doc-badge">v1.0</span></a>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Операционный инструмент</span></div>
+      <a class="doc-card" href="#" onclick="openDoc(5)"><div class="doc-icon" style="background:rgba(107,163,212,0.08)">⊞</div><div class="doc-info"><div class="doc-name">Методика отбора активов</div><div class="doc-meta">6 блоков · П1–П5 · раз в месяц</div></div><span class="card-badge badge-blue doc-badge">v3.4</span></a>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Пути к файлам (настройка)</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Укажи пути к файлам (напр. ./Конституция.docx)</div>
+      <div id="doc-paths-form"></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="view content" id="view-journal">
+    <div><div class="section-title">Журнал решений</div><div class="section-sub">История ключевых решений системы</div></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Новая запись</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="input-field" type="text" id="j-decision" placeholder="Решение (кратко)…">
+        <textarea class="input-field" id="j-logic" placeholder="Обоснование и логика выбора…" style="resize:none;height:70px"></textarea>
+        <div style="display:flex;gap:8px"><input class="input-field" type="text" id="j-tag" placeholder="#тег" style="flex:0 0 120px"><button class="btn primary" style="flex:1" onclick="addJournalEntry()">+ Добавить запись</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">История решений</span></div>
+      <div id="journal-list"></div>
+    </div>
+  </div>
+
+  <!-- AUDIT -->
+  <div class="view content" id="view-audit">
+    <div><div class="section-title">Аудит и ритм системы</div><div class="section-sub">Ежемесячные, квартальные и годовые контрольные точки</div></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-header"><span class="card-title">Ближайшие события</span></div><div id="audit-events"></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Январский аудит · чек-лист</span></div><div id="audit-checklist"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Тест Фейнмана · банк вопросов</span></div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Проводится ежегодно в январе. Выбрать 3 вопроса. Отвечать письменно и независимо.</div>
+      <div id="feynman-list"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ---------- DATA ----------
+const TN = 28_000_000;
+const CHILDREN_TARGET = 4_500_000;
+
+const defaultData = {
+  capital: 0, contribution: 35000, reserve: 0, expenses: 85000, planned: 0,
+  lida: 0, egor: 0, lastContrib: '',
+  lqdt: 0, gold: 0, oil: 0, banks: 0, it: 0, med: 0,
+  journal: [],
+  docPaths: ['', 'Конституция.docx','Стратегия.docx','KidsStrategy.docx','Регламент.docx','Методика.docx'],
+  sheetsUrl: '',
+};
+
+let D = JSON.parse(localStorage.getItem('fondsvobody') || 'null') || {...defaultData};
+
+// ---------- NAVIGATION ----------
+function switchView(viewName, element) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const activeView = document.getElementById('view-' + viewName);
+  if (activeView) activeView.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  if (element) element.classList.add('active');
+}
+
+// Attach event listeners for nav-items
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    const view = item.getAttribute('data-view');
+    if (view) switchView(view, item);
+  });
+});
+
+// ---------- INIT ----------
+function init() {
+  updateDate();
+  loadInputs();
+  calc();
+  renderJournal();
+  renderAudit();
+  renderDocPaths();
+  startTimer();
+  loadSheetsUrl();
+  setInterval(updateDate, 60000);
+}
+
+function updateDate() {
+  const now = new Date();
+  const days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  document.getElementById('topbarDate').innerHTML = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${days[now.getDay()]}`;
+  const h = now.getHours();
+  const greet = h < 12 ? 'Доброе утро' : h < 17 ? 'Добрый день' : 'Добрый вечер';
+  document.getElementById('greeting').innerHTML = `${greet}, Антон.`;
+}
+
+function save() { localStorage.setItem('fondsvobody', JSON.stringify(D)); }
+
+function loadInputs() {
+  const fields = ['capital','contribution','reserve','expenses','planned','lida','egor','lqdt','gold','oil','banks','it','med'];
+  fields.forEach(f => { let el = document.getElementById('inp-'+f); if(el) el.value = D[f]; });
+  if(D.lastContrib) document.getElementById('inp-lastContrib').value = D.lastContrib;
+  if(D.sheetsUrl) document.getElementById('sheetsUrl').value = D.sheetsUrl;
+}
+
+function readInputs() {
+  const fields = ['capital','contribution','reserve','expenses','planned','lida','egor','lqdt','gold','oil','banks','it','med'];
+  fields.forEach(f => { let el = document.getElementById('inp-'+f); if(el) D[f] = parseFloat(el.value) || 0; });
+  let lc = document.getElementById('inp-lastContrib');
+  if(lc) D.lastContrib = lc.value;
+  save();
+}
+
+function fmt(n) {
+  if(n >= 1_000_000) return (n/1_000_000).toFixed(2).replace('.',',') + ' М ₽';
+  if(n >= 1_000) return Math.round(n/1_000) + ' К ₽';
+  return Math.round(n).toLocaleString('ru') + ' ₽';
+}
+function pct(a,b) { return b>0 ? Math.min(100, (a/b*100)) : 0; }
+function pctStr(a,b) { return b>0 ? (a/b*100).toFixed(1)+'%' : '—'; }
+function setBar(id, pct) { let el = document.getElementById(id); if(el) el.style.width = Math.min(100, pct)+'%'; }
+function set(id, val) { let el = document.getElementById(id); if(el) el.textContent = val; }
+
+function calc() {
+  readInputs();
+  let {capital, reserve, expenses, planned, lida, egor, lqdt, gold, oil, banks, it, med, contribution} = D;
+
+  let reserveMos = expenses>0 ? reserve/expenses : 0;
+  set('reserve-amount', fmt(reserve));
+  set('reserve-months', `${reserveMos.toFixed(1)} мес из 12`);
+  set('reserve-pct', pctStr(reserveMos,12));
+  setBar('bar-reserve', pct(reserveMos,12));
+  let brakeStat = '';
+  let badgeClass = 'badge-green';
+  if(reserveMos < 3) { brakeStat = '🔴 Автотормоз: взносы остановлены'; badgeClass = 'badge-red'; }
+  else if(reserveMos < 6) { brakeStat = '🟡 Автотормоз: детские взносы приостановлены'; badgeClass = 'badge-amber'; }
+  else if(reserveMos < 12) { brakeStat = '🟡 Резерв ниже цели'; badgeClass = 'badge-amber'; }
+  else { brakeStat = '✅ Автотормоз снят'; badgeClass = 'badge-green'; }
+  set('brake-status', brakeStat);
+  let br = document.getElementById('badge-reserve');
+  if(br) { br.textContent = reserveMos.toFixed(1)+' мес'; br.className = 'card-badge '+badgeClass; }
+
+  let capitalPct = pct(capital, TN);
+  set('capital-amount', fmt(capital));
+  set('capital-pct', pctStr(capital,TN));
+  setBar('bar-capital', capitalPct);
+  set('h-total', fmt(capital));
+
+  let kp = planned>0 ? (capital/planned*100).toFixed(1) : 0;
+  set('h-kp', kp+'%');
+  set('calc-kp', kp+'% '+(kp>=100?'✅':kp>=80?'🟡':'🔴'));
+  set('calc-tn', pctStr(capital,TN));
+  set('calc-reserve', reserveMos.toFixed(1)+' мес');
+
+  if(capital>0 && contribution>0){
+    let r = 0.11/12, months=0, c=capital;
+    while(c<TN && months<600){ c = c*(1+r) + contribution; months++; }
+    let forecastDate = new Date(); forecastDate.setMonth(forecastDate.getMonth()+months);
+    set('calc-forecast', months<600 ? `~${forecastDate.getFullYear()} г. (через ${Math.round(months/12)} лет)` : '> 50 лет');
+    set('tn-year', `горизонт: ~${months<600?forecastDate.getFullYear():2042}`);
+    let monthRate = contribution>0 && capital>0 ? (contribution/capital*100).toFixed(2) : '—';
+    set('capital-meta', `темп ${monthRate}% / мес`);
+  } else { set('calc-forecast','нет данных'); }
+
+  set('lida-amount', fmt(lida));
+  set('egor-amount', fmt(egor));
+  set('lida-pct', pctStr(lida,CHILDREN_TARGET));
+  set('egor-pct', pctStr(egor,CHILDREN_TARGET));
+  setBar('bar-lida', pct(lida,CHILDREN_TARGET));
+  setBar('bar-egor', pct(egor,CHILDREN_TARGET));
+
+  let sectors = [
+    {name:'LQDT', val:lqdt, min:4, label:'≥ 4%'},
+    {name:'GOLD ETF', val:gold, min:9, label:'≥ 9%'},
+    {name:'Нефтегаз', val:oil, max:22, label:'≤ 22%'},
+    {name:'Банки', val:banks, max:20, label:'≤ 20%'},
+    {name:'IT/Телеком', val:it, max:15, label:'≤ 15%'},
+    {name:'Медицина', val:med, max:10, label:'≤ 10%'}
+  ];
+  let rebHtml = '';
+  sectors.forEach(s => {
+    let ok = s.max ? s.val <= s.max : s.val >= s.min;
+    let color = s.val===0 ? 'var(--text3)' : ok ? 'var(--green)' : 'var(--red)';
+    let badge = s.val===0 ? '—' : ok ? `${s.val.toFixed(1)}% ✅` : `${s.val.toFixed(1)}% ⚠`;
+    rebHtml += `<div class="status-row"><div class="status-dot" style="background:${color}"></div><div class="status-name">${s.name} <span style="color:var(--text3);font-size:10px">${s.label}</span></div><div class="status-val">${badge}</div></div>`;
+  });
+  document.getElementById('rebalance-rows').innerHTML = rebHtml;
+
+  set('calc-lqdt', lqdt>0 ? (lqdt>=4 ? `${lqdt.toFixed(1)}% ✅` : `${lqdt.toFixed(1)}% 🔴 Пополнить`) : '—');
+  set('calc-gold', gold>0 ? (gold>=9 ? `${gold.toFixed(1)}% ✅` : `${gold.toFixed(1)}% 🟡 Пополнить`) : '—');
+}
+
+// TIMER
+function startTimer() {
+  function tick() {
+    let now = new Date();
+    let next = new Date(now.getFullYear(), now.getMonth(), 10, 0,0,0);
+    if(next <= now) next = new Date(now.getFullYear(), now.getMonth()+1, 10,0,0,0);
+    let diff = next - now;
+    let d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+    let timerStr = (d>0?`${d}д `:'') + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    document.getElementById('timerDisplay').innerHTML = timerStr;
+    document.getElementById('timerLabel').innerHTML = `до взноса · ${next.getDate()} ${['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'][next.getMonth()]}`;
+  }
+  tick(); setInterval(tick,1000);
+}
+
+// JOURNAL
+function addJournalEntry() {
+  let decision = document.getElementById('j-decision').value.trim();
+  if(!decision) return;
+  D.journal.unshift({ date: new Date().toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'}), decision, logic: document.getElementById('j-logic').value.trim(), tag: document.getElementById('j-tag').value.trim() });
+  save();
+  document.getElementById('j-decision').value = ''; document.getElementById('j-logic').value = ''; document.getElementById('j-tag').value = '';
+  renderJournal();
+}
+function renderJournal() {
+  let el = document.getElementById('journal-list');
+  if(!el) return;
+  if(!D.journal.length){ el.innerHTML = '<div style="font-size:12px;color:var(--text3)">Записей пока нет.</div>'; return; }
+  el.innerHTML = D.journal.map(e => `<div class="journal-entry"><div class="journal-date">${e.date}${e.tag?' · <span style="color:var(--gold)">'+e.tag+'</span>':''}</div><div class="journal-decision">${e.decision}</div>${e.logic?`<div class="journal-logic">${e.logic}</div>`:''}</div>`).join('');
+}
+
+// AUDIT
+function renderAudit() {
+  let now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  let nextContrib = new Date(y,m,10); if(nextContrib <= now) nextContrib = new Date(y,m+1,10);
+  let nextQ = new Date(y, m + (3 - m%3), 1); while(nextQ.getDay()!==0) nextQ.setDate(nextQ.getDate()+1); if(nextQ <= now) { nextQ = new Date(y, m + (3 - m%3) + 3, 1); while(nextQ.getDay()!==0) nextQ.setDate(nextQ.getDate()+1); }
+  let nextJan = new Date(now.getMonth()<11 ? y : y+1, 0, 10);
+  let fmt = d => d.toLocaleDateString('ru',{day:'numeric',month:'short'});
+  let events = [
+    { date: fmt(nextContrib), task: 'Плановый взнос + реинвест дивидендов', who: 'Антон', color: 'var(--gold)' },
+    { date: fmt(nextQ), task: 'Обновить три цифры на Панели управления', who: 'Антон', color: 'var(--blue)' },
+    { date: fmt(nextJan), task: 'Годовой аудит: скоринг, ТН, тест Фейнмана', who: 'Оба', color: 'var(--green)' },
+    { date: fmt(nextJan), task: 'Тест усталости — независимо, письменно', who: 'Оба', color: 'var(--amber)' },
+  ];
+  document.getElementById('audit-events').innerHTML = events.map(e => `<div class="rhythm-item"><div class="rhythm-dot" style="background:${e.color}"></div><div class="rhythm-content"><div class="rhythm-task">${e.task}</div><div class="rhythm-meta">${e.who}</div></div><div class="rhythm-date">${e.date}</div></div>`).join('');
+  document.getElementById('rhythm-list').innerHTML = events.slice(0,3).map(e => `<div class="rhythm-item"><div class="rhythm-dot" style="background:${e.color}"></div><div class="rhythm-content"><div class="rhythm-task">${e.task}</div><div class="rhythm-meta">${e.who}</div></div><div class="rhythm-date">${e.date}</div></div>`).join('');
+  let checks = ['Войти в брокера с паролем из папки','Татьяна нашла все 4 счёта','Позвонить фин. советнику','Позвонить доверенному лицу','Физическая папка в порядке','Проверить завещания и доверенность','Обновить раздел 4 Регламента','Метки детских счетов корректны'];
+  let chkHtml = '';
+  checks.forEach((c,i) => { chkHtml += `<div class="status-row"><input type="checkbox" id="chk-${i}" style="accent-color:var(--gold);cursor:pointer" onchange="D['chk_${i}']=this.checked;save()"><label for="chk-${i}" class="status-name" style="cursor:pointer">${c}</label></div>`; });
+  document.getElementById('audit-checklist').innerHTML = chkHtml;
+  let feynman = ['Какова главная цель системы?','Что с взносами если резерв <6 мес?','Где хранятся пароли?','Что делает Татьяна если Антон недоступен?','При какой просадке доп. взнос?','Назови 3 условия изменений?','Назови 3 ограничения детского капитала?','Что такое КП?','Почему детский капитал неприкосновенен?','Пароль-фраза?'];
+  document.getElementById('feynman-list').innerHTML = feynman.map((q,i)=>`<div class="metric-row"><span class="metric-name" style="font-size:12px">${i+1}. ${q}</span></div>`).join('');
+}
+
+// DOCUMENTS PATHS
+function renderDocPaths() {
+  let el = document.getElementById('doc-paths-form');
+  if(!el) return;
+  let names = ['Панель управления','Семейная Конституция','Стратегия родительского портфеля','Капитал Свободы','Регламент','Методика'];
+  el.innerHTML = names.map((n,i)=>`<div class="input-row" style="margin-bottom:8px"><label class="input-label">${n}</label><input class="input-field" type="text" value="${D.docPaths[i]||''}" placeholder="путь к файлу" oninput="D.docPaths[${i}]=this.value;save()" style="font-size:11px"></div>`).join('');
+}
+function openDoc(i) {
+  let path = D.docPaths[i];
+  if(path) window.open(path,'_blank');
+  else alert('Укажи путь к файлу в разделе Документы → Пути к файлам');
+}
+
+// SHEETS
+function saveSheetsUrl() { D.sheetsUrl = document.getElementById('sheetsUrl').value; save(); }
+function loadSheetsUrl() { let el = document.getElementById('sheetsUrl'); if(el && D.sheetsUrl) el.value = D.sheetsUrl; }
+async function loadFromSheets() {
+  let url = document.getElementById('sheetsUrl').value.trim();
+  if(!url) return;
+  let dot = document.getElementById('sheetsDot'), txt = document.getElementById('syncText');
+  dot.className = 'sync-dot loading'; txt.textContent = 'загрузка...';
+  try{
+    let res = await fetch(url);
+    let text = await res.text();
+    let rows = text.trim().split('\n').map(r=>{ let parts=[], cur='', inQ=false; for(let ch of r){ if(ch==='"') inQ=!inQ; else if(ch===',' && !inQ){ parts.push(cur.trim()); cur=''; } else cur+=ch; } parts.push(cur.trim()); return parts; });
+    let map={}; rows.forEach(r=>{ if(r.length>=2 && r[0] && r[0]!=='ключ') map[r[0].toLowerCase()]=r[1]; });
+    let numFields = {capital:'capital',contribution:'contribution',reserve:'reserve',expenses:'expenses',planned:'planned',lida:'lida',egor:'egor',lqdt:'lqdt',gold:'gold',oil:'oil',banks:'banks',it:'it',med:'med'};
+    Object.entries(numFields).forEach(([k,v])=>{ if(map[k]!==undefined) D[v]=parseFloat(map[k])||0; });
+    dot.className = 'sync-dot'; txt.textContent = 'синхронизировано';
+    loadInputs(); calc(); save();
+  } catch(e){ dot.className = 'sync-dot error'; txt.textContent = 'ошибка загрузки'; }
+}
+
+// EXPORT / IMPORT
+function exportData() {
+  let blob = new Blob([JSON.stringify(D,null,2)], {type:'application/json'});
+  let a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fond-svobody-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function showImport() {
+  let inp = document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange = e => {
+    let file = e.target.files[0];
+    if(!file) return;
+    let reader = new FileReader();
+    reader.onload = ev => { try { D = {...defaultData, ...JSON.parse(ev.target.result)}; save(); loadInputs(); calc(); renderJournal(); renderAudit(); renderDocPaths(); alert('Данные восстановлены.'); } catch(e){ alert('Ошибка файла.'); } };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// START
+init();
+</script>
+</body>
+</html>
